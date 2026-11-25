@@ -11,11 +11,19 @@ import StatusBadge from "../components/StatusBadge";
 import ActionBar from "../components/ActionBar";
 import PrimaryButton from "../components/PrimaryButton";
 
-/**
- * Halaman 07 — Checkout.
- * Struktur & label dari metadata Figma; nilai biaya mengikuti konteks
- * layanan antrean (disamakan persis saat detail Figma tersedia kembali).
- */
+/** Badge hijau "VIP PARTNER" (sesuai revisi Figma Page 7). */
+function GreenBadge({ children }: { children: string }) {
+  return (
+    <div className="inline-flex items-center gap-1.5 rounded-pill bg-[#102a23] px-2.5 py-[5px]">
+      <span className="size-[5px] shrink-0 rounded-pill bg-[#4edea3]" />
+      <span className="whitespace-nowrap font-mono text-[10px] font-bold text-[#4edea3]">
+        {children}
+      </span>
+    </div>
+  );
+}
+
+/** Halaman 07 — Checkout (layanan antrean digital gratis). */
 export default function CheckoutPage() {
   const navigate = useNavigate();
   const [agree, setAgree] = useState(true);
@@ -27,13 +35,13 @@ export default function CheckoutPage() {
 
       <main className="flex min-h-0 flex-1 flex-col items-start gap-4 overflow-y-auto px-5 pb-3 pt-2.5">
         <h1 className="w-full font-display text-[26px] font-bold leading-[1.2] text-white">
-          Selesaikan pemesanan antrean Anda.
+          Satu langkah lagi untuk antre.
         </h1>
 
-        {/* Ringkasan restoran */}
-        <Card>
+        {/* Ringkasan restoran + pemesan */}
+        <Card className="flex flex-col gap-3">
           <div className="flex w-full flex-col gap-[5px]">
-            <StatusBadge>VIP PARTNER</StatusBadge>
+            <GreenBadge>VIP PARTNER</GreenBadge>
             <p className="font-display text-xl font-bold leading-[1.2] text-white">
               De Soematra 1897
             </p>
@@ -41,37 +49,13 @@ export default function CheckoutPage() {
               4 tamu · Indoor AC Main Hall
             </p>
           </div>
-          <div className="mt-4 flex flex-col gap-3">
-            <Divider />
-            <DetailRow label="Estimasi antrean" value="15–20 menit" valueClass="text-amber-soft" />
-          </div>
-        </Card>
-
-        {/* Rincian biaya */}
-        <Card>
-          <p className="mb-3 font-display text-base font-bold text-white">
-            Rincian Biaya
-          </p>
-          <div className="flex flex-col gap-2.5">
-            <DetailRow label="Biaya layanan antrean" value="Rp 25.000" />
-            <DetailRow label="Biaya aplikasi" value="Rp 2.000" />
-            <DetailRow label="PPN 11%" value="Rp 2.970" />
-            <Divider />
-            <div className="flex w-full items-center">
-              <span className="flex-1 text-sm text-muted">Total pembayaran</span>
-              <span className="font-display text-xl font-bold text-amber">
-                Rp 29.970
-              </span>
-            </div>
-            <div className="mt-2">
-              <StatusBadge>PEMBAYARAN SAAT CHECK-IN</StatusBadge>
-            </div>
-          </div>
+          <Divider />
+          <DetailRow label="Pemesan" value="Budi Santoso" />
         </Card>
 
         <p className="w-full text-xs leading-[1.5] text-muted">
-          Biaya hanya ditagih setelah Anda berhasil check-in di restoran.
-          Pembatalan sebelum nomor dipanggil tidak dikenai biaya.
+          Hanya layanan antrean digital. Makanan dan minuman dipesan serta
+          dibayar di restoran.
         </p>
 
         {/* Consent */}
@@ -81,21 +65,25 @@ export default function CheckoutPage() {
           className="flex w-full items-start gap-2.5 text-left"
         >
           <span
-            className={`mt-0.5 grid size-5 shrink-0 place-items-center rounded-[6px] border ${
-              agree ? "border-amber bg-amber" : "border-line bg-transparent"
+            className={`grid size-5 shrink-0 place-items-center rounded-[4px] ${
+              agree ? "bg-amber" : "border border-line bg-transparent"
             }`}
           >
             {agree ? <Check className="size-3.5 text-amber-ink" /> : null}
           </span>
-          <span className="text-xs leading-[1.5] text-muted">
-            Saya menyetujui Syarat Layanan & Kebijakan Antrean TitipAntri.
+          <span className="flex-1 text-[11px] leading-[1.6] text-muted">
+            Saya menyetujui{" "}
+            <span className="text-amber-soft underline">
+              Syarat &amp; Kebijakan Layanan
+            </span>{" "}
+            serta ketentuan konfirmasi di kasir dalam 5 menit setelah dipanggil.
           </span>
         </button>
       </main>
 
-      <ActionBar secondary="Nomor antrean diterbitkan setelah konfirmasi.">
+      <ActionBar secondary="Tidak ada pembayaran untuk layanan promo ini.">
         <PrimaryButton onClick={() => navigate("/tiket")}>
-          Terbitkan Tiket Antrean
+          Konfirmasi &amp; Terbitkan Tiket
         </PrimaryButton>
       </ActionBar>
     </MobileFrame>
