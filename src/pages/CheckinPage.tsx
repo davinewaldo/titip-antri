@@ -8,11 +8,13 @@ import DetailRow from "../components/DetailRow";
 import StatusBadge from "../components/StatusBadge";
 import ActionBar from "../components/ActionBar";
 import PrimaryButton from "../components/PrimaryButton";
+import { useBooking } from "../store/BookingContext";
 import tablePhoto from "/assets/resto-detail.png";
 
 /** Halaman 11 — Check-in Berhasil & Menuju Meja. */
 export default function CheckinPage() {
   const navigate = useNavigate();
+  const booking = useBooking();
 
   return (
     <MobileFrame>
@@ -38,12 +40,12 @@ export default function CheckinPage() {
         {/* Assigned table card */}
         <div className="flex w-full flex-col overflow-hidden rounded-card bg-surface">
           <div className="h-[118px] w-full overflow-hidden">
-            <img src={tablePhoto} alt="De Soematra 1897" className="size-full object-cover" />
+            <img src={tablePhoto} alt={booking.restaurant.name} className="size-full object-cover" />
           </div>
           <div className="flex flex-col gap-4 p-4">
             <div className="flex flex-col gap-1">
               <p className="font-display text-xl font-bold leading-[1.2] text-white">
-                De Soematra 1897
+                {booking.restaurant.name}
               </p>
               <p className="text-[11px] leading-[1.5] text-muted">
                 Indoor AC Main Hall

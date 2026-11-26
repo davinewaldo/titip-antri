@@ -9,12 +9,23 @@ import Card from "../components/Card";
 import InfoBox from "../components/InfoBox";
 import ActionBar from "../components/ActionBar";
 import PrimaryButton from "../components/PrimaryButton";
+import { useBooking } from "../store/BookingContext";
 
 /** Halaman 02 — Login WhatsApp. */
 export default function LoginPage() {
   const navigate = useNavigate();
-  const [phone, setPhone] = useState("81298834120");
+  const booking = useBooking();
+  const [phone, setPhone] = useState(booking.phone || "81298834120");
   const [remember, setRemember] = useState(true);
+
+  // Nomor minimal 8 digit baru boleh lanjut
+  const phoneValid = phone.replace(/\D/g, "").length >= 8;
+
+  const handleSubmit = () => {
+    if (!phoneValid) return;
+    booking.set("phone", phone);
+    navigate("/otp");
+  };
 
   return (
     <MobileFrame>
@@ -80,7 +91,7 @@ export default function LoginPage() {
       </main>
 
       <ActionBar secondary="Dengan masuk, Anda menyetujui Syarat & Kebijakan Layanan.">
-        <PrimaryButton onClick={() => navigate("/otp")}>
+        <PrimaryButton onClick={handleSubmit} disabled={!phoneValid}>
           Kirim Kode OTP
         </PrimaryButton>
       </ActionBar>

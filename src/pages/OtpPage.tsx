@@ -9,13 +9,19 @@ import Card from "../components/Card";
 import InfoBox from "../components/InfoBox";
 import ActionBar from "../components/ActionBar";
 import PrimaryButton from "../components/PrimaryButton";
+import { useBooking } from "../store/BookingContext";
+import { useCountdown } from "../hooks/useCountdown";
 
-/** Halaman 03 — Verifikasi OTP (4 digit). */
+/** Halaman 03 — Verifikasi OTP (4 digit, timer berjalan, validasi). */
 export default function OtpPage() {
   const navigate = useNavigate();
-  // Nilai awal sesuai desain Figma: 7 4 9 2
-  const [digits, setDigits] = useState(["7", "4", "9", "2"]);
+  const booking = useBooking();
+  // Kode awal kosong agar pengguna benar-benar mengetik
+  const [digits, setDigits] = useState(["", "", "", ""]);
   const refs = useRef<(HTMLInputElement | null)[]>([]);
+  const { seconds, label, reset } = useCountdown(47);
+
+  const complete = digits.every((d) => d !== "");
 
   const setDigit = (i: number, v: string) => {
     const clean = v.replace(/\D/g, "").slice(-1);
@@ -25,6 +31,18 @@ export default function OtpPage() {
       return next;
     });
     if (clean && i < 3) refs.current[i + 1]?.focus();
+  };
+
+  const handleKeyDown = (i: number, e: React.KeyboardEvent) => {
+    if (e.key === "Backspace" && !digits[i] && i > 0) {
+      refs.current[i - 1]?.focus();
+    }
+  };
+
+  const handleConfirm = () => {
+    if (!complete) return;
+    booking.set("otp", digits.join(""));
+    navigate("/eksplor");
   };
 
   return (
@@ -61,16 +79,30 @@ export default function OtpPage() {
                 value={d}
                 inputMode="numeric"
                 maxLength={1}
+                autoFocus={i === 0}
                 onChange={(e) => setDigit(i, e.target.value)}
+                onKeyDown={(e) => handleKeyDown(i, e)}
                 className={`h-16 w-0 min-w-0 flex-1 rounded-lg border bg-[#1f1f22] text-center font-mono text-[26px] font-bold text-amber outline-none ${
-                  i === 3 ? "border-amber" : "border-line"
+                  d ? "border-amber" : "border-line"
                 } focus:border-amber`}
               />
             ))}
           </div>
           <div className="flex w-full items-center gap-3 text-xs leading-[1.5]">
-            <span className="flex-1 text-muted">Kirim ulang kode dalam</span>
-            <span className="font-semibold text-white">00:47</span>
+            <span className="flex-1 text-muted">
+              {seconds > 0 ? "Kirim ulang kode dalam" : "Tidak menerima kode?"}
+            </span>
+            {seconds > 0 ? (
+              <span className="font-semibold text-white">{label}</span>
+            ) : (
+              <button
+                type="button"
+                onClick={reset}
+                className="font-semibold text-amber-soft"
+              >
+                Kirim ulang
+              </button>
+            )}
           </div>
         </Card>
 
@@ -80,8 +112,8 @@ export default function OtpPage() {
       </main>
 
       <ActionBar secondary="Butuh bantuan? Hubungi TitipAntri">
-        <PrimaryButton onClick={() => navigate("/eksplor")}>
-          Konfirmasi & Masuk
+        <PrimaryButton onClick={handleConfirm} disabled={!complete}>
+          Konfirmasi &amp; Masuk
         </PrimaryButton>
       </ActionBar>
     </MobileFrame>

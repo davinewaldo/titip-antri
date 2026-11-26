@@ -6,6 +6,7 @@ import TopNav from "../components/TopNav";
 import StageLabel from "../components/StageLabel";
 import ActionBar from "../components/ActionBar";
 import PrimaryButton from "../components/PrimaryButton";
+import { useBooking } from "../store/BookingContext";
 import detailPhoto from "/assets/resto-detail.png";
 
 const guestOptions = ["1", "2", "4", "6", "8+"];
@@ -34,8 +35,15 @@ const areas = [
 /** Halaman 05 — Detail Restoran & Pilih Meja. */
 export default function DetailPage() {
   const navigate = useNavigate();
-  const [guest, setGuest] = useState("4");
-  const [area, setArea] = useState("indoor");
+  const booking = useBooking();
+  const [guest, setGuest] = useState(booking.guestCount);
+  const [area, setArea] = useState(booking.area);
+
+  const handleNext = () => {
+    booking.set("guestCount", guest);
+    booking.set("area", area);
+    navigate("/pemesan");
+  };
 
   return (
     <MobileFrame>
@@ -50,17 +58,17 @@ export default function DetailPage() {
         {/* Restaurant identity */}
         <div className="flex w-full flex-col gap-[5px]">
           <div className="flex w-full items-center gap-3 text-xs leading-[1.5]">
-            <span className="flex-1 text-muted">HERITAGE FINE DINING</span>
-            <span className="font-semibold text-amber-soft">★ 4.9</span>
+            <span className="flex-1 text-muted">{booking.restaurant.category}</span>
+            <span className="font-semibold text-amber-soft">★ {booking.restaurant.rating}</span>
           </div>
           <p className="w-full font-display text-2xl font-bold leading-[1.2] text-white">
-            De Soematra 1897
+            {booking.restaurant.name}
           </p>
           <p className="w-full text-[11px] leading-[1.5] text-muted">
-            Jl. Sumatera No.88, Gubeng, Surabaya
+            {booking.restaurant.address}
           </p>
           <p className="w-full text-[11px] leading-[1.5] text-[#4edea3]">
-            Buka s/d 23:00 · Estimasi antrean 15–20 menit
+            Buka s/d 23:00 · Estimasi antrean {booking.restaurant.estimate}
           </p>
         </div>
 
@@ -120,7 +128,7 @@ export default function DetailPage() {
       </main>
 
       <ActionBar secondary={`${guest} tamu · ${areas.find((a) => a.key === area)?.title}`}>
-        <PrimaryButton onClick={() => navigate("/pemesan")}>
+        <PrimaryButton onClick={handleNext}>
           Lanjut ke Data Pemesan
         </PrimaryButton>
       </ActionBar>

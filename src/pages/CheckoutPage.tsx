@@ -9,6 +9,7 @@ import Divider from "../components/Divider";
 import DetailRow from "../components/DetailRow";
 import ActionBar from "../components/ActionBar";
 import PrimaryButton from "../components/PrimaryButton";
+import { useBooking } from "../store/BookingContext";
 
 /** Badge hijau "VIP PARTNER" (sesuai revisi Figma Page 7). */
 function GreenBadge({ children }: { children: string }) {
@@ -23,9 +24,24 @@ function GreenBadge({ children }: { children: string }) {
 }
 
 /** Halaman 07 — Checkout (layanan antrean digital gratis). */
+const AREA_LABEL: Record<string, string> = {
+  indoor: "Indoor AC Main Hall",
+  veranda: "Colonial Veranda",
+  vip: "Private VIP Salon",
+};
+
 export default function CheckoutPage() {
   const navigate = useNavigate();
-  const [agree, setAgree] = useState(true);
+  const booking = useBooking();
+  const [agree, setAgree] = useState(booking.consent);
+
+  const areaLabel = AREA_LABEL[booking.area] ?? booking.area;
+
+  const handleConfirm = () => {
+    if (!agree) return;
+    booking.set("consent", true);
+    navigate("/tiket");
+  };
 
   return (
     <MobileFrame>
@@ -42,14 +58,14 @@ export default function CheckoutPage() {
           <div className="flex w-full flex-col gap-[5px]">
             <GreenBadge>VIP PARTNER</GreenBadge>
             <p className="font-display text-xl font-bold leading-[1.2] text-white">
-              De Soematra 1897
+              {booking.restaurant.name}
             </p>
             <p className="text-xs leading-[1.5] text-muted">
-              4 tamu · Indoor AC Main Hall
+              {booking.guestCount} tamu · {areaLabel}
             </p>
           </div>
           <Divider />
-          <DetailRow label="Pemesan" value="Budi Santoso" />
+          <DetailRow label="Pemesan" value={booking.customerName} />
         </Card>
 
         <p className="w-full text-xs leading-[1.5] text-muted">
@@ -81,7 +97,7 @@ export default function CheckoutPage() {
       </main>
 
       <ActionBar secondary="Tidak ada pembayaran untuk layanan promo ini.">
-        <PrimaryButton onClick={() => navigate("/tiket")}>
+        <PrimaryButton onClick={handleConfirm} disabled={!agree}>
           Konfirmasi &amp; Terbitkan Tiket
         </PrimaryButton>
       </ActionBar>

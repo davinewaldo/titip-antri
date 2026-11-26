@@ -8,6 +8,7 @@ import FormField from "../components/FormField";
 import InfoBox from "../components/InfoBox";
 import ActionBar from "../components/ActionBar";
 import PrimaryButton from "../components/PrimaryButton";
+import { useBooking } from "../store/BookingContext";
 
 /** Badge hijau "VIP PARTNER" dsb. */
 function GreenBadge({ children }: { children: string }) {
@@ -33,12 +34,31 @@ function AmberBadge({ children }: { children: string }) {
   );
 }
 
+/** Label area ruangan dari kode. */
+const AREA_LABEL: Record<string, string> = {
+  indoor: "Indoor AC Main Hall",
+  veranda: "Colonial Veranda",
+  vip: "Private VIP Salon",
+};
+
 /** Halaman 06 — Data Pemesan & Konfirmasi. */
 export default function PemesanPage() {
   const navigate = useNavigate();
-  const [name, setName] = useState("Budi Santoso");
-  const [phone, setPhone] = useState("+62 812-9883-4120");
-  const [note, setNote] = useState("Perayaan ulang tahun kecil & 1 high chair anak.");
+  const booking = useBooking();
+  const [name, setName] = useState(booking.customerName);
+  const [phone, setPhone] = useState(booking.customerPhone);
+  const [note, setNote] = useState(booking.note);
+
+  const valid = name.trim().length > 1 && phone.trim().length >= 8;
+  const areaLabel = AREA_LABEL[booking.area] ?? booking.area;
+
+  const handleNext = () => {
+    if (!valid) return;
+    booking.set("customerName", name);
+    booking.set("customerPhone", phone);
+    booking.set("note", note);
+    navigate("/checkout");
+  };
 
   return (
     <MobileFrame>
@@ -51,13 +71,13 @@ export default function PemesanPage() {
           <div className="flex w-full flex-col gap-[5px]">
             <GreenBadge>VIP PARTNER</GreenBadge>
             <p className="font-display text-xl font-bold leading-[1.2] text-white">
-              De Soematra 1897
+              {booking.restaurant.name}
             </p>
             <p className="text-[11px] leading-[1.5] text-muted">
-              Jl. Sumatera No.88, Gubeng, Surabaya
+              {booking.restaurant.address}
             </p>
             <p className="text-xs leading-[1.5] text-muted">
-              4 tamu · Indoor AC Main Hall
+              {booking.guestCount} tamu · {areaLabel}
             </p>
           </div>
         </Card>
@@ -95,7 +115,7 @@ export default function PemesanPage() {
       </main>
 
       <ActionBar secondary="Periksa kembali data sebelum melanjutkan.">
-        <PrimaryButton onClick={() => navigate("/checkout")}>
+        <PrimaryButton onClick={handleNext} disabled={!valid}>
           Lanjut ke Checkout
         </PrimaryButton>
       </ActionBar>

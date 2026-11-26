@@ -1,5 +1,5 @@
-import { Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Check } from "lucide-react";
 import MobileFrame from "../components/MobileFrame";
 import TopNav from "../components/TopNav";
 import StageLabel from "../components/StageLabel";
@@ -11,10 +11,12 @@ import QueueNumber from "../components/QueueNumber";
 import Barcode from "../components/Barcode";
 import ActionBar from "../components/ActionBar";
 import PrimaryButton from "../components/PrimaryButton";
+import { useBooking } from "../store/BookingContext";
 
 /** Halaman 08 — Tiket Antrean Diterbitkan. */
 export default function TiketPage() {
   const navigate = useNavigate();
+  const booking = useBooking();
 
   return (
     <MobileFrame>
@@ -44,25 +46,25 @@ export default function TiketPage() {
           <div className="flex w-full flex-col gap-[5px]">
             <StatusBadge>VIP PARTNER</StatusBadge>
             <p className="font-display text-xl font-bold leading-[1.2] text-white">
-              De Soematra 1897
+              {booking.restaurant.name}
             </p>
             <p className="text-[11px] leading-[1.5] text-muted">
-              Jl. Sumatera No.88, Gubeng, Surabaya
+              {booking.restaurant.address}
             </p>
             <p className="text-xs leading-[1.5] text-muted">
-              4 tamu · Indoor AC Main Hall
+              {booking.guestCount} tamu · Indoor AC Main Hall
             </p>
           </div>
 
           <Divider />
-          <QueueNumber label="Nomor Antrean Anda" code="A-072" />
+          <QueueNumber label="Nomor Antrean Anda" code={booking.queueCode} />
           <p className="w-full text-center text-xs leading-[1.5] text-muted">
             Tunjukkan nomor ini saat dipanggil kasir.
           </p>
 
           <Divider />
-          <Barcode code="TA-2026-0072" />
-          <DetailRow label="Diterbitkan" value="23:58 · 23 Nov 2026" />
+          <Barcode code={booking.ticketId} />
+          <DetailRow label="Pemesan" value={booking.customerName} />
         </Card>
 
         <p className="w-full text-xs leading-[1.5] text-muted">
