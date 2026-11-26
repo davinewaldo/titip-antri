@@ -7,7 +7,6 @@ import StageLabel from "../components/StageLabel";
 import Card from "../components/Card";
 import Divider from "../components/Divider";
 import DetailRow from "../components/DetailRow";
-import StatusBadge from "../components/StatusBadge";
 import ActionBar from "../components/ActionBar";
 import PrimaryButton from "../components/PrimaryButton";
 
